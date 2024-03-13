@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: backend
+  # DataSource Config
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: #/user-center
+    username: root
+    password: kjq
+  # session 失效时间
+  session:
+    # 1天
+    timeout: 86400
