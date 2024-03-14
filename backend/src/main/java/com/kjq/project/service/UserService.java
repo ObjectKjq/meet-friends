@@ -5,6 +5,7 @@ import com.kjq.project.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
 * @author 86175
@@ -32,9 +33,31 @@ public interface UserService extends IService<User> {
     BaseResponse<User> userLogin(String userAccount, String userPassword, HttpServletRequest request);
 
     /**
+     * 获取用户对象
+     * @param request
+     * @return
+     */
+    User getLoginUser(HttpServletRequest request);
+
+    /**
      * 用户脱密
      * @param user
      * @return
      */
     User getSafetyUser(User user);
+
+
+    /**
+     * 内存过滤
+     * @param tagNameList
+     * @return
+     */
+    List<User> searchUserByTags(List<String> tagNameList);
+
+    /**
+     * sql过滤
+     * @param tagNameList
+     * @return
+     */
+    List<User> searchUserByTagsSQL(List<String> tagNameList);
 }

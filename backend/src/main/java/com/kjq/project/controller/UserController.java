@@ -1,14 +1,15 @@
 package com.kjq.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kjq.project.annotation.AuthCheck;
 import com.kjq.project.common.BaseResponse;
 import com.kjq.project.common.ErrorCode;
 import com.kjq.project.common.ResultUtils;
-import com.kjq.project.contant.UserContent;
+import com.kjq.project.constant.UserConstant;
 import com.kjq.project.exception.BusinessException;
 import com.kjq.project.model.entity.User;
-import com.kjq.project.model.request.UserLoginRequest;
-import com.kjq.project.model.request.UserRegisterRequest;
+import com.kjq.project.model.dto.user.UserLoginRequest;
+import com.kjq.project.model.dto.user.UserRegisterRequest;
 import com.kjq.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -59,11 +60,9 @@ public class UserController {
         return userService.userLogin(userAccount, userPassword, request);
     }
 
+    @AuthCheck(mustRole = "admin")
     @GetMapping("/search")
-    public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request){
-        if(!isAdmin(request)){
-            throw new BusinessException(ErrorCode.NOT_AUTH, "用户没有访问权限");
-        }
+    public BaseResponse<List<User>> searchUsers(String username){
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         if(StringUtils.isNotBlank(username)){
             queryWrapper.like("username", username);
@@ -75,12 +74,9 @@ public class UserController {
         return ResultUtils.success(users);
     }
 
+    @AuthCheck(mustRole = "admin")
     @GetMapping("/delete")
-    public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request){
-        //管理员查询
-        if(!isAdmin(request)){
-            throw new BusinessException(ErrorCode.NOT_AUTH, "用户没有访问权限");
-        }
+    public BaseResponse<Boolean> deleteUser(@RequestBody long id){
         if(id <= 0){
             throw new BusinessException(ErrorCode.NULL_ERROR, "参数错误");
         }
@@ -95,29 +91,16 @@ public class UserController {
      */
     @GetMapping("/info")
     public BaseResponse<User> getUser(HttpServletRequest request){
-        User attribute = (User) request.getSession().getAttribute(UserContent.USER_LOGIN_STATE);
+        User attribute = (User) request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
         if(attribute == null){
             throw new BusinessException(ErrorCode.NOT_LOGIN, "用户没有登陆");
         }
-        long userId = attribute.getId();
-        User user = userService.getById(userId);
-        return ResultUtils.success(userService.getSafetyUser(user));
+        return ResultUtils.success(userService.getSafetyUser(userService.getLoginUser(request)));
     }
 
     @PostMapping("/logout")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request){
-        request.getSession().removeAttribute(UserContent.USER_LOGIN_STATE);
+        request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
         return ResultUtils.success(true);
-    }
-
-    /**
-     * 是否为管理员
-     * @param request
-     * @return
-     */
-    private boolean isAdmin(HttpServletRequest request){
-        //管理员查询
-        User user = (User) request.getSession().getAttribute(UserContent.USER_LOGIN_STATE);
-        return user != null && user.getUserRole() == UserContent.ADMIN_ROLE;
     }
 }

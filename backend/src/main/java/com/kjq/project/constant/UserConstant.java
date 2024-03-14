@@ -1,9 +1,9 @@
-package com.kjq.project.contant;
+package com.kjq.project.constant;
 
 /**
  * 用户常量
  */
-public interface UserContent {
+public interface UserConstant {
     String USER_LOGIN_STATE = "userLoginState";
 
     /**

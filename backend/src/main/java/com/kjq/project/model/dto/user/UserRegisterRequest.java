@@ -1,4 +1,4 @@
-package com.kjq.project.model.request;
+package com.kjq.project.model.dto.user;
 
 import lombok.Data;
 
