@@ -6,13 +6,13 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || 'vue Admin Template' // page title
+const name = defaultSettings.title || '友缘相逢-后台' // page title
 
 
 const port = process.env.port || process.env.npm_config_port || 9528
 
 module.exports = {
-  publicPath: '/',
+  publicPath: '/back/',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',

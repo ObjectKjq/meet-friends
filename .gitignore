@@ -19,4 +19,4 @@ yarn-error.log*
 *.sw?
 
 target
-aurora-springboot/src/test
+backend/src/test

@@ -28,7 +28,7 @@ router.beforeEach(async(to, from, next) => {
   const hasGetUserInfo = store.getters.name
   // 用户已经登录
   if (hasGetUserInfo) {
-    
+    console.log(to.path);
     if (whiteList.indexOf(to.path) !== -1) {
       // 如果是登陆页面就跳转到首页
       next({ path: '/' })
@@ -46,6 +46,7 @@ router.beforeEach(async(to, from, next) => {
     if(roles.length > 0){
       // 根据角色，生成当前角色可以访问的路由
       const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+      console.log(accessRoutes);
       // 把角色生的路由规则添加到路由系统中
       router.addRoutes(accessRoutes)
       if (whiteList.indexOf(to.path) !== -1) {

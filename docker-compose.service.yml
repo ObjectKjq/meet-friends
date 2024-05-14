@@ -1,0 +1,22 @@
+version: "2.27.0"
+services: 
+  meet-friends-backend:
+    container_name: meet-friends-backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - mynetwork
+  meet-friends-frontend:
+    container_name: meet-friends-frontend
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - mynetwork
+networks:
+  mynetwork:

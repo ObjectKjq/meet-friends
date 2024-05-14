@@ -1,46 +1,52 @@
 <template>
-  <van-cell title="头像" is-link>
-    <img :src="user.avatarUrl" style="height: 42px" alt="" srcset="">
-  </van-cell>
-  <van-cell title="昵称" is-link :value="user.username"/>
-  <van-cell title="账号" is-link :value="user.userAccount"/>
-  <van-cell title="性别" is-link @click="toEdit('gender', "性别", user.gender)" :value="user.gender"/>
-  <van-cell title="电话" is-link :value="user.phone"/>
-  <van-cell title="邮箱" is-link :value="user.email"/>
-  <van-cell title="注册时间" is-link :value="时间"/>
+  <van-empty v-if="user.username==null" description="你没有登录快去登录吧!">
+    <van-button round type="primary" @click="toLogin" class="bottom-button">去登录</van-button>
+  </van-empty>
+  <div v-else>
+    <van-cell title="当前用户" :value="user?.username" />
+    <van-cell title="修改信息" is-link to="/user/update" />
+    <van-cell title="我创建的队伍" is-link to="/user/team/create" />
+    <van-cell title="我加入的队伍" is-link to="/user/team/join" />
+    <van-cell @click="logout" title="退出登录" is-link/>
+  </div>
 </template>
+
 
 <script setup lang="ts">
 import {useRouter} from 'vue-router'
-const router = useRouter();
+import { getLoginUser, logOut } from "../api/tag"
+import {ref, onMounted} from 'vue'
+import {UTCTime} from '../utils/UTCTime'
+import { showSuccessToast } from 'vant';
 
-const user = {
-  id: 1,
-  username: "kjq",
-  userAccount: "qwe",
-  avatarUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/unicloudlogo.png",
-  gender: 1,
-  phone: "qeqweqwewqe",
-  email: "1221@qq.com",
-  userStatus: 1,
-  userRole: 1,
-  tags: ['sdfs'],
-  // createTime: new Date()
+const router = useRouter();
+const user = ref({})
+
+onMounted(()=>{
+    getLoginUser().then((res)=>{
+      user.value = res.data;
+      const time = UTCTime(user.value.createTime)
+      user.value.createTime = time;
+    })
+})
+
+const toLogin = () => {
+  router.replace("/login")
 }
 
-const toEdit = (editKey: string, editName: string, currentValue: number) => {
-  router.push({
-    path: "/user/edit",
-    query: {
-      editKey,
-      currentValue,
-      editName
-    }
+const logout = () => {
+  logOut().then(()=>{
+    showSuccessToast('退出成功');
+    router.replace("/login")
   })
 }
+    
 
 </script>
 
-<style>
-
+<style scoped>
+.bottom-button {
+    width: 160px;
+    height: 40px;
+  }
 </style>

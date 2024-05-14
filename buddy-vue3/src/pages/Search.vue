@@ -23,39 +23,26 @@
     v-model:active-id="activeIds"
     v-model:main-active-index="activeIndex"
     :items="tagList"/>
+    <div style="padding: 12px">
+        <van-button  block type="primary" @click="doSearchResult">搜索</van-button>
+    </div>
 </template>
 
 <script setup>
 import { showToast } from 'vant';
 import 'vant/es/toast/style';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { listTag } from '../api/tag'
+const router = useRouter();
 //用户选择的标签
 const activeIds = ref([]);
 // 一级选择的初始值
 const activeIndex = ref(0);
 //搜索的内容
 const searchText = ref('')
-
-const originTagList = [
-    {
-        text: '浙江',
-        children: [
-        { text: '杭州', id: '杭州' },
-        { text: '温州', id: '温州' },
-        { text: '宁波', id: '宁波' },
-        ],
-    },
-    {
-        text: '江苏',
-        children: [
-        { text: '南京', id: '南京' },
-        { text: '无锡', id: '无锡' },
-        { text: '徐州', id: '徐州' },
-        ],
-    }
-]
-
-const tagList = ref(originTagList);
+// 标签列表
+const tagList = ref([]);
 
 // 搜索内容
 const onSearch = (val) => {
@@ -80,6 +67,36 @@ const doClose = (tag) => {
         return item !== tag;
     })
 }
+// 搜索用户列表
+const doSearchResult = () => {
+    router.push({
+        path:"/user/list",
+        query: {
+            tags: activeIds.value
+        }
+    })
+}
+
+onMounted(()=>{
+    // 搜索标签数据，展示所有标签
+    listTag().then((res)=>{
+        let tagsList = [];
+        res.data.forEach(tag => {
+            let tagListChild = [];
+            tag[1].forEach(tagChild=>{
+                tagListChild.push({
+                    text:tagChild.tagName,
+                    id:tagChild.tagName
+                })
+            })
+            tagsList.push({
+                text:tag[0].tagName,
+                children:tagListChild
+            });
+        });
+        tagList.value = tagsList;
+    })
+})
 </script>
 
 <style>

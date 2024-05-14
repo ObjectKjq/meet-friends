@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author 86175
@@ -60,4 +61,18 @@ public interface UserService extends IService<User> {
      * @return
      */
     List<User> searchUserByTagsSQL(List<String> tagNameList);
+
+    /**
+     * 修改用户信息
+     * @return
+     */
+    Integer updateUser(User user, User loginUser);
+
+    boolean isAdmin(HttpServletRequest request);
+
+    List<User> matchUsers(long num, User loginUser);
+
+    Map<Long, List<User>> matchListUsers(long num, List<User> users);
+
+    List<User> match(User loginUser, List<User> userList, long num);
 }

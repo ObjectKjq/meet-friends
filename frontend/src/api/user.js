@@ -35,8 +35,14 @@ export function search(query) {
   return request({
     url: '/user/search',
     method: 'get',
-    params:{
-      username: query.username
-    }
+    params:query
+  })
+}
+
+// 统计昨天前10名浏览次数最多的用户
+export function getNumber() {
+  return request({
+    url: '/statistics/number',
+    method: 'get'
   })
 }

@@ -1,13 +1,25 @@
+server:
+  port: 8081
 spring:
-  application:
-    name: backend
   # DataSource Config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: #/user-center
+    url: jdbc:mysql://mysql:3306/user-center
     username: root
     password: kjq
-  # session 失效时间
-  session:
-    # 1天
-    timeout: 86400
+  # 配置redis配置
+  redis:
+    host: redis
+    port: 6379
+    # 默认是0库，使用那个数据库
+    database: 0
+    # 连接密码，没有空着
+    password:
+    # 连接超时时间
+    timeout: 5000
+# minio相关配置
+minio:
+  endpoint: http://minio:9000 #Minio服务所在地址
+  bucketName: meet-friends #存储桶名称
+  accessKey: minioadmin #访问的key
+  secretKey: minioadmin #访问的秘钥

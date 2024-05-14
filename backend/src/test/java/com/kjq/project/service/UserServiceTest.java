@@ -3,13 +3,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kjq.project.model.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RList;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
@@ -20,6 +26,9 @@ class UserServiceTest {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private RedissonClient redissonClient;
 
     @Test
     public void testAddUser(){
@@ -67,4 +76,31 @@ class UserServiceTest {
         log.info("返回结果", users);
         Assert.assertNotNull(users);
     }
+
+    @Test
+    void test(){
+        RLock lock = redissonClient.getLock("kjq.precachejob:docache:lock");
+        try {
+            //获取锁，如果有锁返回false
+            if(lock.tryLock(0, -1L, TimeUnit.MILLISECONDS)){
+                Thread.sleep(30000000L);
+                 System.out.println("========="+Thread.currentThread().getId());
+                //从数据库中遍历所有用户，查询他们的列表执行，预热到缓存中
+                if (!("List" == "dfs")) {
+
+                }
+            }
+        } catch (InterruptedException e) {
+            log.error("redis set key error", e);
+        } finally {
+            //判断是不是当前线程加的锁
+            if(lock.isHeldByCurrentThread()){
+                //System.out.println("========="+Thread.currentThread().getId());
+                //释放锁
+                lock.unlock();
+            }
+        }
+    }
+
+
 }

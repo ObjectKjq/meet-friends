@@ -9,6 +9,7 @@
         添加
       </el-button>
     </div>
+    
     <el-table
     ref="multipleTable"
     v-loading="listLoading"
@@ -42,6 +43,9 @@
       <el-table-column prop="email" label="邮箱">
       </el-table-column>
       <el-table-column prop="userStatus" label="状态">
+        <template slot-scope="scope">
+          {{scope.row.userStatus == 0?'可用':'禁用'}}
+        </template>
       </el-table-column>
       <el-table-column label="角色" width="70">
         <template slot-scope="scope">
@@ -49,7 +53,10 @@
           <span v-else-if="scope.row.userRole == 1">管理员</span>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间">
+      <el-table-column label="创建时间">
+        <template slot-scope="scope">
+          {{UTCTime(scope.row.createTime)}}
+        </template>
       </el-table-column>
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">
@@ -64,21 +71,20 @@
     </el-table>
 
     <el-pagination
-      @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :page-sizes="[3, 20, 30, 40]"
+      :page-size="listQuery.limit"
       :current-page="1"
       background
-      layout="total, sizes, prev, pager, next, jumper"
+      layout="total, prev, pager, next, jumper"
       :total="total"
       class="page">
     </el-pagination>
-
   </div>
 </template>
 
 <script>
 import {search} from '@/api/user'
+import { UTCTime } from '@/utils/UTCTime'
 export default {
   data() {
     return {
@@ -87,12 +93,12 @@ export default {
         // 第几页
         page: 1,
         // 每页多少条数据
-        limit: 3,
+        limit: 5,
         // 搜索用户名
         username: undefined,
       },
       // 总共有多少条数据
-      total: 100,
+      total: 0,
       // 列表是否在加载中
       listLoading: false,
       // 数据绑定到这里
@@ -108,33 +114,37 @@ export default {
     handleDelete(){
       
     },
-    // 根据用户名搜索数据
-    handleFilter(){
-      
-    },
     // 添加用户
     handleCreate(){
 
     },
-    // 选择每页展示多少条数据调用
-    handleSizeChange(limit){
-      this.listQuery.limit = limit;
-      this.listQuery.page = 1;
-      this.listQuery.title = undefined;
-      
+    // 根据用户名搜索数据
+    handleFilter(){
+      this.initList();
     },
     // 选择页面调用
     handleCurrentChange(page){
       this.listQuery.page = page;
-      
-    }
+      this.initList();
+    },
+    // 初始化数据
+    initList(){
+      // 初始化数据
+      this.listLoading = true;
+      search({
+        userName: this.listQuery.username,
+        current: this.listQuery.page,
+        pageSize: this.listQuery.limit,
+      }).then((res)=>{
+        this.list = res.data.records;
+        this.total = res.data.total;
+        this.listLoading = false;
+      })
+    },
+    UTCTime,
   },
   created(){
-    // 初始化数据
-    // this.listLoading = true;
-    search(this.listQuery).then((res)=>{
-      this.list = res.data;
-    })
+    this.initList();
   }
 }
 </script>

@@ -14,4 +14,5 @@ export type UserType = {
     userRole: number;
     tags: string[];
     createTime: Date;
+    profile?:string
 }
