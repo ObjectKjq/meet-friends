@@ -7,6 +7,7 @@ import com.kjq.project.common.DeleteRequest;
 import com.kjq.project.common.ErrorCode;
 import com.kjq.project.common.ResultUtils;
 import com.kjq.project.exception.BusinessException;
+import com.kjq.project.manager.Finder;
 import com.kjq.project.model.dto.team.*;
 import com.kjq.project.model.entity.Team;
 import com.kjq.project.model.entity.User;
@@ -53,6 +54,15 @@ public class TeamController {
      */
     @PostMapping("/add")
     public BaseResponse<Long> addTeam(@RequestBody TeamAddRequest teamAddRequest, HttpServletRequest request) {
+        //判断队伍名字和描述中是否有铭感词
+        String name = teamAddRequest.getName();
+        String description = teamAddRequest.getDescription();
+        // 找出文本中的敏感词
+        Set<String> finderName = Finder.find(name);
+        Set<String> finderDescription = Finder.find(description);
+        if (finderName.size() > 0 || finderDescription.size() > 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
         if (teamAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -84,7 +94,7 @@ public class TeamController {
     }
 
     /**
-     * 跟新队伍
+     * 更新队伍
      * @param teamUpdateRequest
      * @param request
      * @return
